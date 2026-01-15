@@ -7,7 +7,6 @@ provider "aws" {
 resource "aws_instance" "linux" {
   ami           = "ami-0cca134ec43cf708f"
   instance_type = "t2.micro"
-  key_name      = "ram_aws"
 
   tags = {
     Name   = "Test server"
@@ -16,5 +15,7 @@ resource "aws_instance" "linux" {
 }
 
 output "public_ip" {
-  value = aws_instance.linux.public_ip
+  description = "Public IP of the EC2 instance"
+  value       = aws_instance.linux.public_ip
 }
+
