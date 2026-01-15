@@ -6,6 +6,7 @@ pipeline {
         PROJECT_NAME  = "Terraform EC2 Automation"
         ACTION        = "apply"   // change to destroy when required
         AWS_REGION    = "ap-south-1"
+        TF_BIN        = "/usr/bin/terraform"
     }
 
     options {
@@ -18,45 +19,38 @@ pipeline {
         stage('Pipeline Info') {
             steps {
                 echo "======================================"
-                echo "Project Name   : ${PROJECT_NAME}"
-                echo "Project Owner  : ${PROJECT_OWNER}"
-                echo "AWS Region     : ${AWS_REGION}"
+                echo "Project Name    : ${PROJECT_NAME}"
+                echo "Project Owner   : ${PROJECT_OWNER}"
+                echo "AWS Region      : ${AWS_REGION}"
                 echo "Terraform Action: ${ACTION}"
                 echo "======================================"
-            }
-        }
-
-        stage('Checkout Terraform Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/shubhangivspatil/terraproject.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
                 sh '''
-                    terraform --version
-                    terraform init
+                    ${TF_BIN} --version
+                    ${TF_BIN} init
                 '''
             }
         }
 
         stage('Terraform Validate') {
             steps {
-                sh 'terraform validate'
+                sh '${TF_BIN} validate'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                sh '${TF_BIN} plan'
             }
         }
 
         stage('Terraform Apply / Destroy') {
             steps {
-                sh "terraform ${ACTION} --auto-approve"
+                sh "${TF_BIN} ${ACTION} -auto-approve"
             }
         }
     }
