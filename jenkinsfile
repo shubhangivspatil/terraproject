@@ -4,9 +4,9 @@ pipeline {
     environment {
         PROJECT_OWNER = "shubhangivspatil"
         PROJECT_NAME  = "Terraform EC2 Automation"
-        ACTION        = "apply"   // change to destroy when required
+        ACTION        = "apply"        // change to destroy when required
         AWS_REGION    = "ap-south-1"
-        TF_BIN        = ""        // will be detected dynamically
+        TF_BIN        = "terraform"    // Jenkins can see this
     }
 
     options {
@@ -28,24 +28,6 @@ pipeline {
             }
         }
 
-        stage('Detect Terraform') {
-            steps {
-                script {
-                    // Detect terraform binary dynamically
-                    TF_BIN = sh(
-                        script: "which terraform || echo ''",
-                        returnStdout: true
-                    ).trim()
-
-                    if (TF_BIN == "") {
-                        error "❌ Terraform not found on this Jenkins agent!"
-                    } else {
-                        echo "✅ Terraform found at: ${TF_BIN}"
-                    }
-                }
-            }
-        }
-
         stage('Debug Environment') {
             steps {
                 sh '''
@@ -58,13 +40,11 @@ pipeline {
 
         stage('Terraform Init') {
             environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')     // Jenkins AWS credentials
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key') // Jenkins AWS credentials
+                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
             }
             steps {
-                sh """
-                ${TF_BIN} init
-                """
+                sh "${TF_BIN} init"
             }
         }
 
@@ -74,9 +54,7 @@ pipeline {
                 AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
             }
             steps {
-                sh """
-                ${TF_BIN} validate
-                """
+                sh "${TF_BIN} validate"
             }
         }
 
@@ -86,15 +64,13 @@ pipeline {
                 AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
             }
             steps {
-                sh """
-                ${TF_BIN} plan -out=tfplan
-                """
+                sh "${TF_BIN} plan -out=tfplan"
             }
         }
 
         stage('Manual Approval') {
             when {
-                expression { return ACTION == 'apply' }  // only ask approval for apply
+                expression { return ACTION == 'apply' }
             }
             steps {
                 input message: "Do you want to continue with Terraform APPLY?"
@@ -107,9 +83,7 @@ pipeline {
                 AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
             }
             steps {
-                sh """
-                ${TF_BIN} ${ACTION} -auto-approve
-                """
+                sh "${TF_BIN} ${ACTION} -auto-approve"
             }
         }
     }
