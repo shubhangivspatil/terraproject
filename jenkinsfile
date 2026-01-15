@@ -29,7 +29,7 @@ pipeline {
         stage('Checkout Terraform Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/srm71118/terraproject.git'
+                    url: 'https://github.com/shubhangivspatil/terraproject.git'
             }
         }
 
