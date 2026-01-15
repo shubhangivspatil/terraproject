@@ -1,106 +1,87 @@
 pipeline {
-    agent any
-
-    environment {
-        PROJECT_OWNER = "shubhangivspatil"
-        PROJECT_NAME  = "Terraform EC2 Automation"
-        ACTION        = "apply"        // change to destroy when required
-        AWS_REGION    = "ap-south-1"
-        TF_BIN        = "terraform"    // Jenkins can see this
+    agent {
+        node {
+            label 'terraform-node'
+        }
     }
 
-    options {
-        timestamps()
-        disableConcurrentBuilds()
-        timeout(time: 30, unit: 'MINUTES')  // prevent hanging builds
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION    = 'ap-south-1'
+    }
+
+    parameters {
+        choice(
+            name: 'action',
+            choices: ['apply', 'destroy'],
+            description: 'Select Terraform action'
+        )
     }
 
     stages {
 
-        stage('Pipeline Info') {
+        stage('Checkout Code') {
             steps {
-                echo "======================================"
-                echo "Project Name    : ${PROJECT_NAME}"
-                echo "Project Owner   : ${PROJECT_OWNER}"
-                echo "AWS Region      : ${AWS_REGION}"
-                echo "Terraform Action: ${ACTION}"
-                echo "======================================"
+                checkout scm
             }
         }
 
-        stage('Debug Environment') {
+        stage('Terraform Format Check') {
             steps {
-                sh '''
-                echo "Jenkins user: $(whoami)"
-                echo "PATH: $PATH"
-                ${TF_BIN} --version
-                '''
+                sh 'terraform fmt -check'
             }
         }
 
         stage('Terraform Init') {
-            environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-            }
             steps {
-                sh "${TF_BIN} init"
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Validate') {
-            environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-            }
             steps {
-                sh "${TF_BIN} validate"
+                sh 'terraform validate'
             }
         }
 
         stage('Terraform Plan') {
-            environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-            }
             steps {
-                sh "${TF_BIN} plan -out=tfplan"
+                sh """
+                  terraform plan \
+                  -out=tfplan
+                """
             }
         }
 
-        stage('Manual Approval') {
+        stage('Terraform Apply/Destroy') {
             when {
-                expression { return ACTION == 'apply' }
+                expression { params.action == 'apply' }
             }
             steps {
-                input message: "Do you want to continue with Terraform APPLY?"
+                sh 'terraform apply -auto-approve tfplan'
             }
         }
 
-        stage('Terraform Apply / Destroy') {
-            environment {
-                AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        stage('Terraform Destroy') {
+            when {
+                expression { params.action == 'destroy' }
             }
             steps {
-                sh "${TF_BIN} ${ACTION} -auto-approve"
+                sh 'terraform destroy -auto-approve'
             }
         }
     }
 
     post {
         success {
-            echo "✅ SUCCESS: Terraform ${ACTION} completed successfully"
-            echo "👩‍💻 Executed by: ${PROJECT_OWNER}"
+            echo "Terraform ${params.action} completed successfully"
         }
-
         failure {
-            echo "❌ FAILURE: Terraform ${ACTION} failed"
-            echo "👩‍💻 Executed by: ${PROJECT_OWNER}"
+            echo "Terraform ${params.action} failed"
         }
-
         always {
-            echo "📌 Pipeline execution finished"
+            cleanWs()
         }
     }
 }
