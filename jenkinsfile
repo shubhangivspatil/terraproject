@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_OWNER = "shubhangivspatil"
+        PROJECT_NAME  = "Terraform EC2 Automation"
+        ACTION        = "apply"   // change to destroy when required
+        AWS_REGION    = "ap-south-1"
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+
+        stage('Pipeline Info') {
+            steps {
+                echo "======================================"
+                echo "Project Name   : ${PROJECT_NAME}"
+                echo "Project Owner  : ${PROJECT_OWNER}"
+                echo "AWS Region     : ${AWS_REGION}"
+                echo "Terraform Action: ${ACTION}"
+                echo "======================================"
+            }
+        }
+
+        stage('Checkout Terraform Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/srm71118/terraproject.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                    terraform --version
+                    terraform init
+                '''
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply / Destroy') {
+            steps {
+                sh "terraform ${ACTION} --auto-approve"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ SUCCESS: Terraform ${ACTION} completed successfully"
+            echo "👩‍💻 Executed by: ${PROJECT_OWNER}"
+        }
+
+        failure {
+            echo "❌ FAILURE: Terraform ${ACTION} failed"
+            echo "👩‍💻 Executed by: ${PROJECT_OWNER}"
+        }
+
+        always {
+            echo "📌 Pipeline execution finished"
+        }
+    }
+}
