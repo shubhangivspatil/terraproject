@@ -42,8 +42,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Checkout main branch
-                //git branch: 'main', url: 'https://github.com/shubhangivspatil/terraproject.git'
-                sh 'checkout scm'
+                git branch: 'main', url: 'https://github.com/shubhangivspatil/terraproject.git'
             }
         }
           stage('Credentials'){
