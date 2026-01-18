@@ -72,7 +72,7 @@ pipeline {
 
             steps {
                 sh '''
-                        terraform ${param.action} --auto-approve
+                        terraform ${action} --auto-approve
                 '''
             }
         }
