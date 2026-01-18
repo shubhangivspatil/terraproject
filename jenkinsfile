@@ -31,6 +31,31 @@ pipeline{
         }
 
     }
+
+post{
+        success{
+            emailext (
+                subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                body: """
+                SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': 
+                Check console output at "${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+                """,
+                to: 'sallyvp28@gmail.com',
+                from: 'shubhangivspatil@gmail.com',
+            )
+        }
+        failure{
+            emailext (
+                subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                body: """
+                FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': 
+                Check console output at "${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+                """,
+                to: 'sallyvp28@gmail.com',
+                from: 'shubhangivspatil@gmail.com',
+            )
+        }
+    }
 }
 
   
