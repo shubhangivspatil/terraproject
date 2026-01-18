@@ -77,16 +77,7 @@ pipeline {
             }
         }
 
-        stage('Show EC2 Outputs') {
-            when {
-                expression { params.action == 'apply' }
-            }
-            steps {
-                // Display Terraform outputs like EC2 public IP
-                sh 'terraform output'
-            }
-        }
-    }
+       
 
     post {
         success {
