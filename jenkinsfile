@@ -21,7 +21,7 @@ pipeline{
         }
         stage('Terraform action'){
             steps{
-                withCredentials([[$class:'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]){
+                withCredentials([[$class:'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_credentials']]){
                     sh '''
                     echo "Terraform action is ---> ${action}"
                     terraform ${action} --auto-approve
