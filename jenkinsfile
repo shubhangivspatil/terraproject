@@ -69,40 +69,12 @@ pipeline {
             }
         }
 
-        stage('Terraform Validate') {
-            steps {
-                sh 'terraform validate'
-            }
-        }
+        stage('Terraform action') {
 
-        stage('Terraform Plan') {
-            steps {
-                sh 'terraform plan -out=tfplan'
-            }
-        }
-
-        stage('Terraform Apply') {
-            when {
-                expression { params.action == 'apply' }
-            }
             steps {
                 sh '''
-                    if [ -f tfplan ]; then
-                        terraform apply -auto-approve tfplan
-                    else
-                        echo "Plan file missing, applying directly..."
-                        terraform apply -auto-approve
-                    fi
+                        terraform ${param.action} --auto-approve
                 '''
-            }
-        }
-
-        stage('Terraform Destroy') {
-            when {
-                expression { params.action == 'destroy' }
-            }
-            steps {
-                sh 'terraform destroy -auto-approve'
             }
         }
 
