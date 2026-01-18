@@ -42,9 +42,20 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Checkout main branch
-                git branch: 'main', url: 'https://github.com/shubhangivspatil/terraproject.git'
+                //git branch: 'main', url: 'https://github.com/shubhangivspatil/terraproject.git'
+                sh 'checkout scm'
             }
         }
+          stage('Credentials'){
+            steps{
+                sh '''
+                mkdir -p ~/.aws
+                echo "[default]" > ~/.aws/credentials 
+                echo "AWS_ACCESS_KEY_ID = ${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials 
+                echo "AWS_SECRET_ACCESS_KEY = ${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials 
+                '''
+            }
+        }        
 
         stage('Terraform Format Check') {
             steps {
