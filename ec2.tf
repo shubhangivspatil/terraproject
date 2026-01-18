@@ -1,7 +1,9 @@
 ########## Launch EC2 Instance in Mumbai region and show EC2 public IP
 
 provider "aws" {
+
   region = "ap-south-1"
+   
 }
 
 resource "aws_instance" "linux" {
