@@ -51,7 +51,7 @@ ${env.BUILD_URL}
 Regards,
 Jenkins
 """,
-                to: 'sallyvp28@gmail.com',
+                to: 'foladevops@gmail.com',
                 replyTo: 'shubhangivspatil@gmail.com',
                 mimeType: 'text/plain',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider']]
@@ -76,7 +76,7 @@ ${env.BUILD_URL}
 Regards,
 Jenkins
 """,
-                to: 'sallyvp28@gmail.com',
+                to: 'foladevops@gmail.com',
                 replyTo: 'shubhangivspatil@gmail.com',
                 mimeType: 'text/plain',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider']]
