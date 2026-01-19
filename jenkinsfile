@@ -32,11 +32,11 @@ pipeline{
 
     }
 
-post {
-    success {
-        emailext(
-            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
+ post {
+        success {
+            emailext(
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
 Hello Team,
 
 The Jenkins job completed SUCCESSFULLY.
@@ -51,17 +51,17 @@ ${env.BUILD_URL}
 Regards,
 Jenkins
 """,
-            to: 'sallyvp28@gmail.com',
-            replyTo: 'shubhangivspatil@gmail.com',
-            mimeType: 'text/plain',
-            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-        )
-    }
+                to: 'sallyvp28@gmail.com',
+                replyTo: 'shubhangivspatil@gmail.com',
+                mimeType: 'text/plain',
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
 
-    failure {
-        emailext(
-            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
+        failure {
+            emailext(
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
 Hello Team,
 
 The Jenkins job has FAILED.
@@ -76,13 +76,11 @@ ${env.BUILD_URL}
 Regards,
 Jenkins
 """,
-            to: 'sallyvp28@gmail.com',
-            replyTo: 'shubhangivspatil@gmail.com',
-            mimeType: 'text/plain',
-            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-        )
+                to: 'sallyvp28@gmail.com',
+                replyTo: 'shubhangivspatil@gmail.com',
+                mimeType: 'text/plain',
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            )
+        }
     }
-}
-
-  
-    
+}   //
