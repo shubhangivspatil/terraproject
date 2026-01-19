@@ -32,29 +32,55 @@ pipeline{
 
     }
 
-post{
-        success{
-            emailext (
-                subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """
-                SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': 
-                Check console output at "${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-                """,
-                to: 'sallyvp28@gmail.com',
-                from: 'shubhangivspatil@gmail.com',
-            )
-        }
-        failure{
-            emailext (
-                subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """
-                FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': 
-                Check console output at "${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-                """,
-                to: 'sallyvp28@gmail.com',
-                from: 'shubhangivspatil@gmail.com',
-            )
-        }
+post {
+    success {
+        emailext(
+            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Hello Team,
+
+The Jenkins job completed SUCCESSFULLY.
+
+Job Name   : ${env.JOB_NAME}
+Build No   : ${env.BUILD_NUMBER}
+Status     : SUCCESS
+
+Check console output:
+${env.BUILD_URL}
+
+Regards,
+Jenkins
+""",
+            to: 'sallyvp28@gmail.com',
+            replyTo: 'shubhangivspatil@gmail.com',
+            mimeType: 'text/plain',
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        )
+    }
+
+    failure {
+        emailext(
+            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Hello Team,
+
+The Jenkins job has FAILED.
+
+Job Name   : ${env.JOB_NAME}
+Build No   : ${env.BUILD_NUMBER}
+Status     : FAILURE
+
+Please check console output:
+${env.BUILD_URL}
+
+Regards,
+Jenkins
+""",
+            to: 'sallyvp28@gmail.com',
+            replyTo: 'shubhangivspatil@gmail.com',
+            mimeType: 'text/plain',
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        )
     }
 }
 
